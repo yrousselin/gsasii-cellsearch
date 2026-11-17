@@ -27,7 +27,7 @@ Version 1.5.
 | **GSAS-II** | accueille l'extension | [GSAS-II](https://advancedphotonsource.github.io/GSAS-II-tutorials/install.html) |
 | numpy | calculs | fourni avec GSAS-II |
 | Connexion Internet | recherche dans la COD | |
-| **Conograph** *(recommandé)* | indexation du diagramme de poudre pour obtenir la maille avant la recherche | [téléchargements Z-Code](https://z-code-software.com/downloads/) (Windows et macOS) |
+| **Conograph** *(recommandé)* | indexation du diagramme de poudre pour obtenir la maille avant la recherche, idéalement via l'extension [gsasii-autoindex](https://github.com/yrousselin/gsasii-autoindex) | [téléchargements Z-Code](https://z-code-software.com/downloads/) (Windows et macOS) |
 | pymysql *(facultatif)* | interrogation de la COD beaucoup plus rapide | `pip` (l'installeur macOS l'ajoute) |
 | Logiciels du CCDC avec la CSD Python API *(facultatif)* | recherche dans la CSD | [CCDC](https://www.ccdc.cam.ac.uk/) (licence CSD nécessaire) |
 
@@ -63,7 +63,7 @@ Le chemin trouvé est ensuite mémorisé dans `~/.GSASII/cellsearch.json`.
 
 **Dans GSAS-II**
 
-1. Indexez votre diagramme de poudre dans GSAS-II ou avec Conograph, puis marquez la maille retenue comme *use* dans la *Unit Cells List*. Vous pouvez aussi ouvrir un projet qui contient déjà une phase.
+1. Indexez votre diagramme de poudre, par exemple avec l'extension [gsasii-autoindex](https://github.com/yrousselin/gsasii-autoindex) (Conograph et autres méthodes), puis marquez la maille retenue comme *use* dans la *Unit Cells List*. Vous pouvez aussi ouvrir un projet qui contient déjà une phase.
 2. Ouvrez **Export → Entire project as → (user) Search databases by unit cell**.
 3. Choisissez la maille, la tolérance, les éléments exigés (par exemple `Zn N C H`) et les bases, puis validez.
 4. Le tableau des résultats s'ouvre. Les CIF sont dans un dossier à côté de votre projet.

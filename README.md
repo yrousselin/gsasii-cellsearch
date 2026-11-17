@@ -27,7 +27,7 @@ Version 1.5.
 | **GSAS-II** | hosts the plugin | [GSAS-II](https://advancedphotonsource.github.io/GSAS-II-tutorials/install.html) |
 | numpy | calculations | included with GSAS-II |
 | Internet connection | COD search | |
-| **Conograph** *(recommended)* | indexing the powder pattern to obtain the unit cell before the search | [Z-Code downloads](https://z-code-software.com/downloads/) (Windows and macOS) |
+| **Conograph** *(recommended)* | indexing the powder pattern to obtain the unit cell before the search, ideally through the [gsasii-autoindex](https://github.com/yrousselin/gsasii-autoindex) plugin | [Z-Code downloads](https://z-code-software.com/downloads/) (Windows and macOS) |
 | pymysql *(optional)* | much faster COD queries | `pip` (the macOS installer adds it) |
 | CCDC software with the CSD Python API *(optional)* | CSD search | [CCDC](https://www.ccdc.cam.ac.uk/) (requires a CSD licence) |
 
@@ -63,7 +63,7 @@ The path found is then remembered in `~/.GSASII/cellsearch.json`.
 
 **In GSAS-II**
 
-1. Index your powder pattern in GSAS-II or with Conograph, and mark the chosen cell as *use* in the *Unit Cells List*. You can also open a project that already contains a phase.
+1. Index your powder pattern, for example with the [gsasii-autoindex](https://github.com/yrousselin/gsasii-autoindex) plugin (Conograph and other methods), and mark the chosen cell as *use* in the *Unit Cells List*. You can also open a project that already contains a phase.
 2. Open **Export → Entire project as → (user) Search databases by unit cell**.
 3. Choose the cell, the tolerance, the required elements (for example `Zn N C H`) and the databases, then confirm.
 4. The results table opens. The CIF files are in a folder next to your project.
