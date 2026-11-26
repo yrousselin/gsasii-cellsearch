@@ -78,8 +78,6 @@ python g2_cellsearch.py project.gpx --local ~/ICSD_exports --elements "Zn N C H"
 python g2_cellsearch.py --help                             # all options
 ```
 
-Command-line messages are in French.
-
 ## Limitations
 
 - Supercells and subcells are not searched.

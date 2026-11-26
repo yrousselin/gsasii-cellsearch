@@ -14,7 +14,7 @@ Version 1.5.
 
 ## Ce que fait l'extension
 
-- Ajoute à GSAS-II le menu **Export → Entire project as → (user) Search databases by unit cell**.
+- Ajoute à GSAS-II le menu **Export → Entire project as → (user) Search databases by unit cell**. La fenêtre et les messages sont en anglais.
 - Vous laisse choisir la maille : un résultat d'indexation marqué *use* dans la *Unit Cells List*, ou une phase du projet. Vous réglez ensuite la tolérance, les éléments exigés (facultatif) et les bases à interroger.
 - **Comment les mailles sont comparées.** Chaque maille est ramenée à son réseau primitif et décrite par une empreinte qui ne dépend pas du choix des axes : le volume de la maille et la longueur des 7 plus courts vecteurs du réseau. Deux réseaux correspondent quand les 7 longueurs concordent à la tolérance près (1,5 % par défaut). Cette méthode évite les instabilités de la maille réduite de Niggli. Les surstructures et sous-mailles ne sont pas recherchées.
 - Liste les correspondances, classées de la plus proche à la plus éloignée, dans un tableau et un fichier `.csv`, puis télécharge les CIF.

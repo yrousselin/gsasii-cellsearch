@@ -14,10 +14,10 @@ with the same lattice in:
 
 Only numpy is needed. Typical use on the Mac:
 
-  ~/g2main/bin/python g2_cellsearch.py projet.gpx
-  ~/g2main/bin/python g2_cellsearch.py projet.gpx --list
+  ~/g2main/bin/python g2_cellsearch.py project.gpx
+  ~/g2main/bin/python g2_cellsearch.py project.gpx --list
   ~/g2main/bin/python g2_cellsearch.py --cell 8.86 10.45 13.42 101.3 99.9 92.7
-  ~/g2main/bin/python g2_cellsearch.py projet.gpx --local ~/ICSD_exports --icsd
+  ~/g2main/bin/python g2_cellsearch.py project.gpx --local ~/ICSD_exports --icsd
 
 How cells are compared
 ----------------------
@@ -269,7 +269,7 @@ def cells_from_gpx(path):
             try:
                 sym = BRAVAIS[int(c[2])]
                 cands.append(dict(
-                    label="indexation %s, M20=%.1f [%s]%s" % (
+                    label="indexing %s, M20=%.1f [%s]%s" % (
                         sym, c[0], name[5:45], ' (use)' if c in used else ''),
                     cell=[float(x) for x in c[3:9]], centring=sym[0],
                     source='index'))
@@ -452,7 +452,7 @@ def _cod_rest_rows(windows, base, elements, timeout, nslices, log=print):
             if len(rows) < BIG_ANSWER or (vhi - vlo) < 0.5:
                 _cache_put(p, rows)
                 return rows, []
-            last = "reponse trop longue (%d entrees)" % len(rows)
+            last = "answer too long (%d entries)" % len(rows)
         except urllib.error.URLError as exc:
             if 'refused' in str(exc).lower():     # halving would not help
                 return [], ["%.1f-%.1f A3 : %s" % (vlo, vhi, exc)]
@@ -472,8 +472,8 @@ def _cod_rest_rows(windows, base, elements, timeout, nslices, log=print):
         w = (hi - lo) / nsl
         for k in range(nsl):
             jobs.append((m, lo + k * w + (0.001 if k else 0), lo + (k + 1) * w))
-    log("  COD (web) : %d requetes%s ..." % (len(jobs), '' if elements else
-        " (sans filtre d'elements : plusieurs minutes possibles)"))
+    log("  COD (web): %d requests%s ..." % (len(jobs), '' if elements else
+        " (no element filter: this may take several minutes)"))
     out, errors, n = {m: [] for m, _lo, _hi in windows}, [], 0
     for i, (m, lo, hi) in enumerate(jobs):
         rows, errs = fetch(lo, hi)
@@ -481,11 +481,11 @@ def _cod_rest_rows(windows, base, elements, timeout, nslices, log=print):
         n += len(rows)
         errors += ["V x%d, %s" % (m, e) for e in errs]
         if (i + 1) % 4 == 0 or i + 1 == len(jobs):
-            log("  COD (web) : %d/%d requetes, %d entrees lues" % (
+            log("  COD (web): %d/%d requests, %d entries read" % (
                 i + 1, len(jobs), n))
     if errors:
-        errors.append("relancer la recherche : seules les tranches en "
-                      "echec seront redemandees (cache)")
+        errors.append("run the search again: only the failed slices "
+                      "will be requested again (cache)")
     return out, errors
 
 
@@ -511,15 +511,15 @@ def search_cod(query, tol, elements=(), strict=False, timeout=90,
         try:
             t0 = time.time()
             bym = _cod_sql_rows(windows, log=log)
-            log("  COD (SQL) : lecture en %.1f s" % (time.time() - t0))
+            log("  COD (SQL): read in %.1f s" % (time.time() - t0))
         except ImportError:
-            msg = ("module pymysql absent (installer avec : "
+            msg = ("pymysql module missing (install it with: "
                    "%s -m pip install pymysql)" % sys.executable)
-            log("  COD (SQL) : " + msg)
+            log("  COD (SQL): " + msg)
             if mode == 'sql':
                 return [], [msg]
         except Exception as exc:
-            log("  COD (SQL) : indisponible (%s)" % str(exc)[:150])
+            log("  COD (SQL): unavailable (%s)" % str(exc)[:150])
             if mode == 'sql':
                 return [], [str(exc)]
     if bym is None:
@@ -548,10 +548,10 @@ def search_cod(query, tol, elements=(), strict=False, timeout=90,
                 cif=COD_CIF.format(cid))
             if h and h['dlen'] <= 100 * tol and h['dvol'] <= 300 * tol:
                 hits[h['id']] = h
-    log("  COD : entrees par fenetre de volume  " + "  ".join(
+    log("  COD: entries per volume window  " + "  ".join(
         "x%d: %d" % (m, len(bym[m])) for m in sorted(bym)))
-    log("  COD : %d entrees examinees, %d correspondance(s)%s" % (
-        nrows, len(hits), ''.join('\n    ERREUR ' + e for e in errors)))
+    log("  COD: %d entries examined, %d match(es)%s" % (
+        nrows, len(hits), ''.join('\n    ERROR ' + e for e in errors)))
     return list(hits.values()), errors
 
 
@@ -571,7 +571,7 @@ def download_cod_cifs(hits, outdir, nmax=10, timeout=60, log=print):
             h['cif'] = dest
             n += 1
         except Exception as exc:
-            log("  COD %s : CIF non telecharge (%s)" % (h['id'], exc))
+            log("  COD %s: CIF not downloaded (%s)" % (h['id'], exc))
     return n
 
 
@@ -641,8 +641,8 @@ def search_local(query, tol, folder, log=print):
                              ref=os.path.relpath(path, folder), cif=path)
                 if h and h['dlen'] <= 100 * tol and h['dvol'] <= 300 * tol:
                     hits.append(h)
-    log("  dossier local : %d fichier(s) CIF, %d structure(s), "
-        "%d correspondance(s)" % (nfiles, nblocks, len(hits)))
+    log("  local folder: %d CIF file(s), %d structure(s), "
+        "%d match(es)" % (nfiles, nblocks, len(hits)))
     return hits
 
 
@@ -728,7 +728,7 @@ def find_csd_python(csd_home=None, explicit=None, log=print):
         if ok:
             cfg['csd_python'] = c
             _save_config(cfg)
-            log("  CSD : Python du CCDC = %s (ccdc %s)" % (
+            log("  CSD: CCDC Python = %s (ccdc %s)" % (
                 c, msg.splitlines()[-1] if msg else '?'))
             return [c], tried
     return None, tried
@@ -739,11 +739,11 @@ def search_csd(query, tol, outdir, csd_home=None, csd_python=None,
     worker = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                           'csd_cellsearch_worker.py')
     if not os.path.exists(worker):
-        return [], ["csd_cellsearch_worker.py introuvable a cote du script"]
+        return [], ["csd_cellsearch_worker.py not found next to the script"]
     cmd, tried = find_csd_python(csd_home, csd_python, log=log)
     if cmd is None:
-        msg = ["Python du CCDC introuvable (utiliser --csd-python CHEMIN)."]
-        msg += ["   essaye : %s -> %s" % t for t in tried[-4:]]
+        msg = ["CCDC Python not found (use --csd-python PATH)."]
+        msg += ["   tried: %s -> %s" % t for t in tried[-4:]]
         log("  CSD : " + "\n".join(msg))
         return [], msg
     cifdir = os.path.join(outdir, 'csd')
@@ -756,7 +756,7 @@ def search_csd(query, tol, outdir, csd_home=None, csd_python=None,
         r = subprocess.run(cmd + [worker], input=json.dumps(job),
                            capture_output=True, text=True, timeout=timeout)
     except Exception as exc:
-        log("  CSD : echec du lancement (%s)" % exc)
+        log("  CSD: could not start (%s)" % exc)
         return [], [str(exc)]
     out = None
     for line in reversed(r.stdout.splitlines()):
@@ -765,7 +765,7 @@ def search_csd(query, tol, outdir, csd_home=None, csd_python=None,
             break
     if out is None or out.get('error'):
         err = (out or {}).get('error') or (r.stderr or r.stdout)[-1500:]
-        log("  CSD : erreur\n%s" % err)
+        log("  CSD: error\n%s" % err)
         return [], [err]
     hits = []
     for e in out.get('hits', []):
@@ -779,8 +779,8 @@ def search_csd(query, tol, outdir, csd_home=None, csd_python=None,
         # returned, but flag entries outside our own criterion
         h['ok'] = h['dlen'] <= 100 * tol and h['dvol'] <= 300 * tol
         hits.append(h)
-    log("  CSD %s : %d correspondance(s) renvoyee(s) par la recherche "
-        "de maille reduite" % (out.get('csd_version', ''), len(hits)))
+    log("  CSD %s: %d match(es) returned by the "
+        "reduced-cell search" % (out.get('csd_version', ''), len(hits)))
     return hits, []
 
 
@@ -801,11 +801,11 @@ def open_icsd(query_cell, url=ICSD_CELL_URL, log=print):
         webbrowser.open(url)
     except Exception:
         pass
-    log("  ICSD : page de recherche par maille ouverte dans le navigateur.")
-    log("         maille %s : %s" % ("copiee dans le presse-papiers"
-                                     if copied else "a saisir", txt))
-    log("         Exportez les CIF dans un dossier puis relancez avec "
-        "--local DOSSIER")
+    log("  ICSD: unit-cell search page opened in the browser.")
+    log("         cell %s: %s" % ("copied to the clipboard"
+                                     if copied else "to be typed", txt))
+    log("         Export the CIF files to a folder, then run again with "
+        "--local FOLDER")
     return txt
 
 
@@ -819,11 +819,11 @@ def run_search(cell, centring='P', tol=0.015, use_cod=True, use_csd=True,
     """Run all searches. Returns (query Lattice, sorted hits, errors)."""
     query = Lattice(cell, centring)
     log("g2_cellsearch version %s" % __version__)
-    log("Maille recherchee : %s  (%s)" % (fmt_cell(query.cell),
+    log("Cell searched: %s  (%s)" % (fmt_cell(query.cell),
                                            query.centring))
-    log("Maille primitive reduite : %s   V = %.2f A3" % (
+    log("Reduced primitive cell: %s   V = %.2f A3" % (
         fmt_cell(query.reduced_cell), query.volume))
-    log("Tolerance : %.2f %% sur les longueurs, %.2f %% sur le volume" % (
+    log("Tolerance: %.2f %% on lengths, %.2f %% on volume" % (
         100 * tol, 300 * tol))
     if outdir:
         os.makedirs(outdir, exist_ok=True)
@@ -844,17 +844,17 @@ def run_search(cell, centring='P', tol=0.015, use_cod=True, use_csd=True,
         if os.path.isdir(os.path.expanduser(folder)):
             hits += search_local(query, tol, folder, log=log)
         else:
-            errors.append("dossier local introuvable : %s" % folder)
+            errors.append("local folder not found: %s" % folder)
             log("  " + errors[-1])
     if elements:
         n0 = len(hits)
         hits = element_filter(hits, elements, strict)
-        log("  filtre d'elements %s%s : %d -> %d" % (
+        log("  element filter %s%s: %d -> %d" % (
             ' '.join(elements), ' (strict)' if strict else '', n0, len(hits)))
     hits.sort(key=lambda h: (h['dlen'], h['dvol']))
     if outdir and use_cod:
         download_cod_cifs(hits, outdir, nmax=max_cifs, log=log)
-    # resume de la recherche, ecrit par write_csv a cote du CSV (lu par le rapport d'affinement)
+    # summary of the search, written by write_csv next to the CSV (cellsearch_summary.json)
     bases = [b for b, used in (('COD', use_cod), ('CSD', use_csd)) if used]
     query.search_info = {
         'format': 1, 'kind': 'cell', 'date': time.strftime('%Y-%m-%d %H:%M'),
@@ -868,19 +868,19 @@ def run_search(cell, centring='P', tol=0.015, use_cod=True, use_csd=True,
 
 def format_table(hits, nmax=40):
     if not hits:
-        return "Aucune correspondance."
+        return "No match."
     lines = ["%-3s %-6s %-12s %6s %6s  %-11s %-44s %s" % (
-        '#', 'base', 'id', 'dL %', 'dV %', 'groupe', 'maille', 'formule / nom')]
+        '#', 'db', 'id', 'dL %', 'dV %', 'group', 'cell', 'formula / name')]
     for i, h in enumerate(hits[:nmax]):
         desc = h['formula']
         if h['name']:
             desc = (desc + ' | ' if desc else '') + h['name']
-        flag = '' if h['ok'] is not False else ' (hors tol.)'
+        flag = '' if h['ok'] is not False else ' (outside tol.)'
         lines.append("%-3d %-6s %-12s %6.2f %6.2f  %-11s %-44s %s%s" % (
             i + 1, h['db'], h['id'][:12], h['dlen'], h['dvol'], h['sg'][:11],
             fmt_cell(h['cell']), desc[:70], flag))
     if len(hits) > nmax:
-        lines.append("... %d autres (voir le fichier CSV)" % (len(hits) - nmax))
+        lines.append("... %d more (see the CSV file)" % (len(hits) - nmax))
     return "\n".join(lines)
 
 
@@ -909,49 +909,49 @@ def write_csv(hits, path, query):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(
-        description="Recherche de structures connues par la maille "
-                    "(COD, CSD, dossier local de CIF).")
-    ap.add_argument('gpx', nargs='?', help="projet GSAS-II (.gpx)")
+        description="Search for known structures by unit cell "
+                    "(COD, CSD, local CIF folder).")
+    ap.add_argument('gpx', nargs='?', help="GSAS-II project (.gpx)")
     ap.add_argument('--cell', nargs=6, type=float,
                     metavar=('a', 'b', 'c', 'al', 'be', 'ga'))
     ap.add_argument('--centring', default='P',
-                    help="P I F A B C R (avec --cell ; defaut P)")
+                    help="P I F A B C R (with --cell; default P)")
     ap.add_argument('--list', action='store_true',
-                    help="lister les mailles trouvees dans le projet")
+                    help="list the cells found in the project")
     ap.add_argument('--pick', type=int, default=None,
-                    help="numero de la maille a utiliser (voir --list)")
+                    help="number of the cell to use (see --list)")
     ap.add_argument('--tol', type=float, default=1.5,
-                    help="tolerance sur les longueurs en %% (defaut 1.5)")
+                    help="tolerance on lengths in %% (default 1.5)")
     ap.add_argument('--elements', default='',
-                    help="elements exiges (toutes bases), ex. 'Zn N C H'")
+                    help="required elements (all databases), e.g. 'Zn N C H'")
     ap.add_argument('--strict', action='store_true',
-                    help="uniquement ces elements, aucun autre")
+                    help="only these elements, no others")
     ap.add_argument('--no-cod', action='store_true')
     ap.add_argument('--cod-mode', default='auto',
                     choices=('auto', 'sql', 'rest'),
-                    help="acces COD : sql (rapide, pymysql) ou rest (web)")
+                    help="COD access: sql (fast, pymysql) or rest (web)")
     ap.add_argument('--no-csd', action='store_true')
     ap.add_argument('--local', action='append', default=[],
-                    help="dossier de CIF (repetable), ex. exports ICSD")
+                    help="folder of CIF files (repeatable), e.g. ICSD exports")
     ap.add_argument('--icsd', action='store_true',
-                    help="ouvrir la page ICSD et copier la maille")
+                    help="open the ICSD page and copy the cell")
     ap.add_argument('--icsd-url', default=ICSD_CELL_URL)
-    ap.add_argument('--csd-home', default=None, help="defaut ~/CCDC")
+    ap.add_argument('--csd-home', default=None, help="default ~/CCDC")
     ap.add_argument('--csd-python', default=None)
     ap.add_argument('--csd-angle-tol', type=float, default=None)
     ap.add_argument('--max-cifs', type=int, default=10,
-                    help="nombre de CIF COD telecharges (defaut 10)")
-    ap.add_argument('--out', default=None, help="dossier de sortie")
+                    help="number of COD CIF files downloaded (default 10)")
+    ap.add_argument('--out', default=None, help="output folder")
     a = ap.parse_args(argv)
 
     if a.cell:
-        cell, cent, label = a.cell, a.centring, 'ligne de commande'
+        cell, cent, label = a.cell, a.centring, 'command line'
         stem = os.path.abspath('cellsearch')
     elif a.gpx:
         cands = cells_from_gpx(a.gpx)
         if a.list or not cands:
             if not cands:
-                print("Aucune maille (indexation ou phase) dans ce projet.")
+                print("No cell (indexing or phase) in this project.")
                 return 1
             for i, c in enumerate(cands):
                 print("%2d  %s (%s)  %s" % (i + 1, fmt_cell(c['cell']),
@@ -959,15 +959,15 @@ def main(argv=None):
             return 0
         k = (a.pick - 1) if a.pick else 0
         if not 0 <= k < len(cands):
-            print("--pick hors limites (1..%d)" % len(cands))
+            print("--pick out of range (1..%d)" % len(cands))
             return 1
         cell, cent, label = cands[k]['cell'], cands[k]['centring'], \
             cands[k]['label']
         stem = os.path.splitext(os.path.abspath(a.gpx))[0]
     else:
-        ap.error("donner un .gpx ou --cell")
+        ap.error("give a .gpx or --cell")
     outdir = a.out or (stem + '_cellsearch')
-    print("Source de la maille : %s" % label)
+    print("Cell source: %s" % label)
     query, hits, errors = run_search(
         cell, cent, tol=a.tol / 100., use_cod=not a.no_cod,
         use_csd=not a.no_csd, local=a.local,
@@ -979,7 +979,7 @@ def main(argv=None):
     print(format_table(hits))
     csvpath = os.path.join(outdir, 'cellsearch_results.csv')
     write_csv(hits, csvpath, query)
-    print("\nResultats : %s\nCIF       : %s" % (csvpath, outdir))
+    print("\nResults: %s\nCIF    : %s" % (csvpath, outdir))
     if a.icsd:
         open_icsd(query.cell, a.icsd_url)
     return 0

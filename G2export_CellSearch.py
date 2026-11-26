@@ -119,7 +119,7 @@ class ExportCellSearch(G2fil.ExportBaseclass):
             cs.fmt_cell(query.cell), query.centring, query.volume, len(hits))
         sz.Add(wx.StaticText(dlg, label=head), 0, wx.ALL, 6)
         lc = wx.ListCtrl(dlg, style=wx.LC_REPORT | wx.LC_SINGLE_SEL)
-        cols = [('#', 35), ('base', 55), ('id', 95), ('dL %', 55),
+        cols = [('#', 35), ('database', 55), ('id', 95), ('dL %', 55),
                 ('dV %', 55), ('space group', 95), ('cell', 300),
                 ('formula', 170), ('name', 220), ('CIF', 45)]
         for i, (lbl, w) in enumerate(cols):
